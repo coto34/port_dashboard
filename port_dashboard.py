@@ -423,35 +423,35 @@ with col_roi2:
 with col_roi3:
     st.subheader("📊 Resultados ROI")
 
-    def render_roi_card(roi_val, roi_text):
-    is_pos = isinstance(roi_val, (int, float)) and math.isfinite(roi_val) and roi_val >= 0
-    bg = "#e8f5e9" if is_pos else "#fdecea"     # verde/rojo suave
-    border = "#28a745" if is_pos else "#dc3545"
-    txt_color = "#19692c" if is_pos else "#842029"
-
-    return f"""
-    <div style="
-        background:{bg};
-        border-left:8px solid {border};
-        padding:16px;
-        border-radius:10px;
-        margin:6px 0;
-        box-shadow:0 2px 6px rgba(0,0,0,0.08);
-        color: #111 !important;   /* color base del card */
-    ">
-        <div style="font-size:0.95rem;opacity:0.85;margin-bottom:6px;color:#111 !important;">
-            💹 ROI a 3 años
-        </div>
+        def render_roi_card(roi_val, roi_text):
+        is_pos = isinstance(roi_val, (int, float)) and math.isfinite(roi_val) and roi_val >= 0
+        bg = "#e8f5e9" if is_pos else "#fdecea"     # verde/rojo suave
+        border = "#28a745" if is_pos else "#dc3545"
+        txt_color = "#19692c" if is_pos else "#842029"
+    
+        return f"""
         <div style="
-            font-size:2rem;
-            font-weight:800;
-            line-height:1;
-            color:{txt_color} !important;
-            -webkit-text-fill-color:{txt_color} !important;
-            mix-blend-mode:normal !important;
-        ">{roi_text}</div>
-    </div>
-    """
+            background:{bg};
+            border-left:8px solid {border};
+            padding:16px;
+            border-radius:10px;
+            margin:6px 0;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+            color: #111 !important;   /* color base del card */
+        ">
+            <div style="font-size:0.95rem;opacity:0.85;margin-bottom:6px;color:#111 !important;">
+                💹 ROI a 3 años
+            </div>
+            <div style="
+                font-size:2rem;
+                font-weight:800;
+                line-height:1;
+                color:{txt_color} !important;
+                -webkit-text-fill-color:{txt_color} !important;
+                mix-blend-mode:normal !important;
+            ">{roi_text}</div>
+        </div>
+        """
 
 
     if target_port:
