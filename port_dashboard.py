@@ -422,6 +422,26 @@ with col_roi2:
 
 with col_roi3:
     st.subheader("📊 Resultados ROI")
+
+    def render_roi_card(roi_val, roi_text):
+        is_pos = isinstance(roi_val, (int, float)) and math.isfinite(roi_val) and roi_val >= 0
+        bg = "#e8f5e9" if is_pos else "#fdecea"            # verde/rojo suave
+        border = "#28a745" if is_pos else "#dc3545"        # borde verde/rojo
+        text = "#19692c" if is_pos else "#842029"          # texto verde/rojo
+        return f"""
+        <div style="
+            background:{bg};
+            border-left:8px solid {border};
+            padding:16px;
+            border-radius:10px;
+            margin:6px 0;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        ">
+            <div style="font-size:0.95rem;opacity:0.85;margin-bottom:6px;">💹 ROI a 3 años</div>
+            <div style="font-size:2rem;font-weight:800;color:{text};line-height:1;">{roi_text}</div>
+        </div>
+        """
+
     if target_port:
         roi_results = calculate_roi(
             current_teu=port_data['TEU_Annual'],
@@ -431,19 +451,14 @@ with col_roi3:
             cost_per_teu=port_data['Cost_Per_TEU']
         )
         roi_val = roi_results['roi_percentage']
-        roi_text = safe_pct(roi_val, digits=1)  # <- NEW: nunca queda en blanco
-        roi_class = "roi-positive" if (isinstance(roi_val, (int, float)) and math.isfinite(roi_val) and roi_val > 0) else "roi-negative"
+        roi_text = safe_pct(roi_val, digits=1)  # siempre muestra algo (ej. "N/D")
 
-        st.markdown(f"""
-        <div class="metric-card">
-            <h4>💹 ROI a 3 años</h4>
-            <h2 class="{roi_class}">{roi_text}</h2>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(render_roi_card(roi_val, roi_text), unsafe_allow_html=True)
 
         st.metric("Ahorros Anuales", safe_money(roi_results['annual_savings']))
         st.metric("Payback Period", safe_years(roi_results['payback_years']))
-        st.metric("Mejora Productividad", safe_pct(roi_results['productivity_improvement_pct']))
+        st.metric("Mejora Productividad", f"+{safe_pct(roi_results['productivity_improvement_pct'])}")
+
 
 # Análisis de Brechas Detallado
 st.markdown("---")
