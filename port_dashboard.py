@@ -7,6 +7,8 @@ import numpy as np
 from datetime import datetime
 import json
 import math  # <- NEW: para validaciones numéricas
+import streamlit.components.v1 as components
+
 
 # Configuración de la página
 st.set_page_config(
@@ -429,13 +431,50 @@ with col_roi3:
         border = "#28a745" if is_pos else "#dc3545"
         txt_color = "#19692c" if is_pos else "#842029"
 
+        # Use an isolated iframe via components.html to avoid Streamlit/theme CSS overrides
         return f"""
-<div style="background:{bg};border-left:8px solid {border};padding:16px;border-radius:10px;margin:6px 0;box-shadow:0 2px 6px rgba(0,0,0,0.08);color:#111 !important;">
-  <div style="font-size:0.95rem;opacity:0.85;margin-bottom:6px;color:#111 !important;">💹 ROI a 3 años</div>
-  <div style="font-size:2rem;font-weight:800;line-height:1;color:{txt_color} !important;-webkit-text-fill-color:{txt_color} !important;mix-blend-mode:normal !important;">
-    {roi_text}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {{ color-scheme: light; }}
+  body {{
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+    color: #111;                 /* base text color */
+    background: transparent;
+  }}
+  .card {{
+    background:{bg};
+    border-left:8px solid {border};
+    padding:16px;
+    border-radius:10px;
+    margin:6px 0;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  }}
+  .label {{
+    font-size:0.95rem;
+    opacity:0.85;
+    margin-bottom:6px;
+    color:#111;
+  }}
+  .value {{
+    font-size:2rem;
+    font-weight:800;
+    line-height:1;
+    color:{txt_color};
+    -webkit-text-fill-color:{txt_color};
+  }}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="label">💹 ROI a 3 años</div>
+    <div class="value">{roi_text}</div>
   </div>
-</div>
+</body>
+</html>
 """
 
     if target_port:
@@ -449,11 +488,11 @@ with col_roi3:
         roi_val = roi_results['roi_percentage']
         roi_text = safe_pct(roi_val, digits=1)
 
-        st.markdown(render_roi_card(roi_val, roi_text), unsafe_allow_html=True)
+        html = render_roi_card(roi_val, roi_text)
+        components.html(html, height=120, scrolling=False)  # <- isolated iframe
 
         st.metric("Ahorros Anuales", safe_money(roi_results['annual_savings']))
         st.metric("Payback Period", safe_years(roi_results['payback_years']))
-        # si quieres el "+" solo cuando hay número:
         impr = safe_pct(roi_results['productivity_improvement_pct'])
         st.metric("Mejora Productividad", f"+{impr}" if impr != "N/D" else impr)
 
