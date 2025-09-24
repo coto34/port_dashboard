@@ -424,23 +424,35 @@ with col_roi3:
     st.subheader("📊 Resultados ROI")
 
     def render_roi_card(roi_val, roi_text):
-        is_pos = isinstance(roi_val, (int, float)) and math.isfinite(roi_val) and roi_val >= 0
-        bg = "#e8f5e9" if is_pos else "#fdecea"            # verde/rojo suave
-        border = "#28a745" if is_pos else "#dc3545"        # borde verde/rojo
-        text = "#19692c" if is_pos else "#842029"          # texto verde/rojo
-        return f"""
-        <div style="
-            background:{bg};
-            border-left:8px solid {border};
-            padding:16px;
-            border-radius:10px;
-            margin:6px 0;
-            box-shadow:0 2px 6px rgba(0,0,0,0.08);
-        ">
-            <div style="font-size:0.95rem;opacity:0.85;margin-bottom:6px;">💹 ROI a 3 años</div>
-            <div style="font-size:2rem;font-weight:800;color:{text};line-height:1;">{roi_text}</div>
+    is_pos = isinstance(roi_val, (int, float)) and math.isfinite(roi_val) and roi_val >= 0
+    bg = "#e8f5e9" if is_pos else "#fdecea"     # verde/rojo suave
+    border = "#28a745" if is_pos else "#dc3545"
+    txt_color = "#19692c" if is_pos else "#842029"
+
+    return f"""
+    <div style="
+        background:{bg};
+        border-left:8px solid {border};
+        padding:16px;
+        border-radius:10px;
+        margin:6px 0;
+        box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        color: #111 !important;   /* color base del card */
+    ">
+        <div style="font-size:0.95rem;opacity:0.85;margin-bottom:6px;color:#111 !important;">
+            💹 ROI a 3 años
         </div>
-        """
+        <div style="
+            font-size:2rem;
+            font-weight:800;
+            line-height:1;
+            color:{txt_color} !important;
+            -webkit-text-fill-color:{txt_color} !important;
+            mix-blend-mode:normal !important;
+        ">{roi_text}</div>
+    </div>
+    """
+
 
     if target_port:
         roi_results = calculate_roi(
@@ -451,7 +463,8 @@ with col_roi3:
             cost_per_teu=port_data['Cost_Per_TEU']
         )
         roi_val = roi_results['roi_percentage']
-        roi_text = safe_pct(roi_val, digits=1)  # siempre muestra algo (ej. "N/D")
+        roi_text = safe_pct(roi_val, digits=1)
+        st.markdown(render_roi_card(roi_val, roi_text), unsafe_allow_html=True)
 
         st.markdown(render_roi_card(roi_val, roi_text), unsafe_allow_html=True)
 
